@@ -1,28 +1,28 @@
 package sjq.light.goarray;
 
+
 public class GoArray<T> {
     private Object[] array;
     private int offset;
     private int len;
     private int cap;
     
-    private GoArray() {
+    protected GoArray() {
     }
     
-    public GoArray(int cap) {
-        this.array = new Object[cap];
-        this.offset = 0;
-        this.len = 0;
-        this.cap = cap;
-    }
+//    protected GoArray(int len) {
+//        this.array = new Object[cap];
+//        this.offset = 0;
+//        this.len = len;
+//        this.cap = len;
+//    }
     
-    public GoArray(T[] array) {
+    protected GoArray(T[] array) {
         this.array = array;
         this.offset = 0;
         this.len = array.length;
         this.cap = array.length;
     }
-    
     
     @Override
     public String toString() {
@@ -91,7 +91,13 @@ public class GoArray<T> {
     public static <A> GoArray<A> append(GoArray<A> arr,A v) {
         GoArray<A> newGoArray = new GoArray<>();
         if(arr.len >= arr.cap) { // expand
-            int newCap = arr.cap << 1;
+            int newCap;
+            if(arr.cap == 0) {
+                newCap = 1;
+            } else {
+                newCap = arr.cap << 1;
+            }
+            
             Object[] newArray = new Object[newCap];
             Object[] srcArray = arr.array;
             System.arraycopy(srcArray, arr.offset, newArray, 0, arr.cap);
@@ -108,6 +114,24 @@ public class GoArray<T> {
         newGoArray.set(arr.len, v);
         
         return newGoArray;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static <A> GoArray<A> appendList(GoArray<A> arr, A... vs) {
+        for(A v:vs) {
+            arr = append(arr, v);
+        }
+        
+        return arr;
+    }
+    
+    public static <A> GoArray<A> appendSlice(GoArray<A> arr, GoArray<A> slice) {
+        for(int i = 0;i<slice.len;i++) {
+            A v = slice.get(i);
+            arr = append(arr,v);
+        }
+        
+        return arr;
     }
     
     public static <A> int len(GoArray<A> arr) {
@@ -128,15 +152,8 @@ public class GoArray<T> {
         }
     }
     
-    public static <A> GoArray<A> make(Class<A[]> clazz,int cap) {
-        Object[] array = new Object[cap];
-        GoArray<A> goArray = new GoArray<>();
-        goArray.array = array;
-        goArray.offset = 0;
-        goArray.len = 0;
-        goArray.cap = cap;
-        
-        return goArray;
+    public static <A> GoArray<A> make(Class<A[]> clazz,int len) {
+        return make(clazz,len,len);
     }
     
     @SuppressWarnings("unchecked")

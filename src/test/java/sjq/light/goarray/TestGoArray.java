@@ -3,7 +3,7 @@ package sjq.light.goarray;
 public class TestGoArray {
     public static void main(String[] args) {
         {
-            GoArray<Integer> goArray = new GoArray<>(10);
+            GoArray<Integer> goArray = GoArray.make(Integer[].class, 10);
             goArray = GoArray.append(goArray, 1);
             System.out.println(goArray);
             
